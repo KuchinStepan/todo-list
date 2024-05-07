@@ -59,6 +59,49 @@ class Component {
   }
 }
 
+class AddTask extends Component {
+  constructor(props) {
+    super();
+    this.onInputChange = props.onInputChange;
+    this.onAddTask = props.onAddTask;
+  }
+
+  render() {
+    return createElement(
+        "div",
+        { class: "add-todo" },
+        [
+          createElement("input", {
+            id: "new-todo",
+            type: "text",
+            placeholder: "Задание",
+          }, {},{ input: this.onInputChange }),
+          createElement("button", { id: "add-btn" }, "+", { click: this.onAddTask }),
+        ],
+    );
+  }
+}
+
+class Task extends Component {
+  constructor(props) {
+    super();
+    this.taskInfo = props.taskInfo;
+    this.removeTaskById = props.removeTaskById;
+  }
+
+  render() {
+    const input = createElement("input", { type: "checkbox" });
+    input.checked = this.taskInfo.isCompleted;
+
+    return createElement("li", {id: this.taskInfo.id}, [
+      input,
+      createElement("label", {}, this.taskInfo.name),
+      createElement("button", {}, "🗑️", {click: () => this.removeTaskById(this.taskInfo.id)})
+    ]);
+  }
+}
+
+
 class TodoList extends Component {
   constructor() {
     super();
@@ -76,10 +119,12 @@ class TodoList extends Component {
   }
 
   onAddInputChange(event) {
+    console.log(this.state)
     this.state.currentInput = event.target.value;
   }
 
   onAddTask() {
+    console.log(this.state)
     const input = this.state.currentInput;
     if (input === "") {
       alert("Введите название новой задачи");
@@ -100,41 +145,27 @@ class TodoList extends Component {
   renderTasks() {
     let tasks = [];
     for (const task of this.state.tasks) {
-      const input = createElement("input", { type: "checkbox" });
-      input.checked = task.isCompleted;
-
-      const listItem = createElement("li", { id: task.id }, [
-        input,
-        createElement("label", {}, task.name),
-        createElement("button", {}, "🗑️", { click: () => this.removeTaskById(task.id)})
-      ]);
-
-      tasks.push(listItem);
+      const taskComponent = new Task({
+        taskInfo: task,
+        removeTaskById: this.removeTaskById.bind(this),
+      });
+      tasks.push(taskComponent.getDomNode());
     }
     return tasks;
   }
 
   render() {
-    let children = this.renderTasks();
-
     return createElement(
         "div",
         { class: "todo-list" },
         [
           createElement("h1", {}, "TODO List"),
-          createElement("div", { class: "add-todo" }, [
-            createElement("input", {
-              id: "new-todo",
-              type: "text",
-              placeholder: "Задание",
-            }),
-            createElement("button", { id: "add-btn" }, "+", { click: this.onAddTask }),
-          ]),
-          createElement("ul", { id: "todos" }, children),
-        ],
-        { input: this.onAddInputChange }
+          new AddTask({ onInputChange: this.onAddInputChange.bind(this), onAddTask: this.onAddTask.bind(this) }).getDomNode(),
+          createElement("ul", { id: "todos" }, this.renderTasks()),
+        ]
     );
   }
+
 }
 
 document.addEventListener("DOMContentLoaded", () => {
