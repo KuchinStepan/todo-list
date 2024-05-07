@@ -180,7 +180,6 @@ class TodoList extends Component {
         ]
     );
   }
-
 }
 
 document.addEventListener("DOMContentLoaded", () => {
