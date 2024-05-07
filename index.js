@@ -32,6 +32,17 @@
   return element;
 }
 
+class TaskInfo {
+  static tasksIdCounter = 0;
+
+  constructor(name, isCompleted) {
+    this.name = name;
+    this.isCompleted = isCompleted;
+    this.id = `task-id-${TaskInfo.tasksIdCounter}`;
+    TaskInfo.tasksIdCounter++;
+  }
+}
+
 class Component {
   constructor() {
   }
@@ -48,26 +59,14 @@ class Component {
   }
 }
 
-
-class Task {
-  static tasksIdCounter = 0;
-
-  constructor(name, isCompleted) {
-    this.name = name;
-    this.isCompleted = isCompleted;
-    this.id = `task-id-${Task.tasksIdCounter}`;
-    Task.tasksIdCounter++;
-  }
-}
-
 class TodoList extends Component {
   constructor() {
     super();
     this.state = {
       tasks: [
-        new Task("Сделать домашку", false),
-        new Task("Сделать практику", false),
-        new Task("Пойти домой", false),
+        new TaskInfo("Сделать домашку", false),
+        new TaskInfo("Сделать практику", false),
+        new TaskInfo("Пойти домой", false),
       ],
       currentInput: "",
     };
@@ -86,7 +85,7 @@ class TodoList extends Component {
       alert("Введите название новой задачи");
       return;
     }
-    const task = new Task(input, false);
+    const task = new TaskInfo(input, false);
     this.state.currentInput = "";
     this.state.tasks.push(task);
     this.update();
@@ -112,7 +111,6 @@ class TodoList extends Component {
 
       tasks.push(listItem);
     }
-
     return tasks;
   }
 
