@@ -34,8 +34,46 @@ class Component {
   }
 }
 
+
+class Task {
+  constructor(name, isCompleted) {
+    this.name = name;
+    this.isCompleted = isCompleted;
+  }
+}
+
 class TodoList extends Component {
+  constructor() {
+    super();
+    this.state = { tasks: [
+        new Task("Сделать домашку", false),
+        new Task("Сделать практику", false),
+        new Task("Пойти домой", false),
+      ]
+    }
+  }
+
+  _renderTasks() {
+    let tasks = [];
+    for (const task of this.state.tasks) {
+      const input = createElement("input", { type: "checkbox" });
+      input.checked = task.isCompleted;
+
+      const listItem = createElement("li", {}, [
+        input,
+        createElement("label", {}, task.name),
+        createElement("button", {}, "🗑️")
+      ]);
+
+      tasks.push(listItem);
+    }
+
+    return tasks;
+  }
+
   render() {
+    let children = this._renderTasks();
+    
     return createElement("div", { class: "todo-list" }, [
       createElement("h1", {}, "TODO List"),
       createElement("div", { class: "add-todo" }, [
@@ -46,23 +84,7 @@ class TodoList extends Component {
         }),
         createElement("button", { id: "add-btn" }, "+"),
       ]),
-      createElement("ul", { id: "todos" }, [
-        createElement("li", {}, [
-          createElement("input", { type: "checkbox" }),
-          createElement("label", {}, "Сделать домашку"),
-          createElement("button", {}, "🗑️")
-        ]),
-        createElement("li", {}, [
-          createElement("input", { type: "checkbox" }),
-          createElement("label", {}, "Сделать практику"),
-          createElement("button", {}, "🗑️")
-        ]),
-        createElement("li", {}, [
-          createElement("input", { type: "checkbox" }),
-          createElement("label", {}, "Пойти домой"),
-          createElement("button", {}, "🗑️")
-        ]),
-      ]),
+      createElement("ul", { id: "todos" }, children),
     ]);
   }
 }
