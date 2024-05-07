@@ -1,4 +1,4 @@
-﻿function createElement(tag, attributes, children) {
+﻿function createElement(tag, attributes, children, callbacks) {
   const element = document.createElement(tag);
 
   if (attributes) {
@@ -19,6 +19,14 @@
     element.appendChild(document.createTextNode(children));
   } else if (children instanceof HTMLElement) {
     element.appendChild(children);
+  }
+
+  if (callbacks) {
+    for (const name in callbacks) {
+      if (name !== undefined) {
+        element.addEventListener(name, callbacks[name]);
+      }
+    }
   }
 
   return element;
@@ -45,12 +53,26 @@ class Task {
 class TodoList extends Component {
   constructor() {
     super();
-    this.state = { tasks: [
+    this.state = {
+      tasks: [
         new Task("Сделать домашку", false),
         new Task("Сделать практику", false),
         new Task("Пойти домой", false),
-      ]
-    }
+      ],
+      currentInput: "",
+    };
+
+    this.onAddInputChange = this.onAddInputChange.bind(this);
+    this.onAddTask = this.onAddTask.bind(this);
+  }
+
+  onAddInputChange(event) {
+    this.state.currentInput = event.target.value;
+  }
+
+  onAddTask() {
+    const task = new Task(this.state.currentInput, false);
+    this.state.tasks.push(task);
   }
 
   _renderTasks() {
@@ -64,7 +86,6 @@ class TodoList extends Component {
         createElement("label", {}, task.name),
         createElement("button", {}, "🗑️")
       ]);
-
       tasks.push(listItem);
     }
 
@@ -73,19 +94,24 @@ class TodoList extends Component {
 
   render() {
     let children = this._renderTasks();
-    
-    return createElement("div", { class: "todo-list" }, [
-      createElement("h1", {}, "TODO List"),
-      createElement("div", { class: "add-todo" }, [
-        createElement("input", {
-          id: "new-todo",
-          type: "text",
-          placeholder: "Задание",
-        }),
-        createElement("button", { id: "add-btn" }, "+"),
-      ]),
-      createElement("ul", { id: "todos" }, children),
-    ]);
+
+    return createElement(
+        "div",
+        { class: "todo-list" },
+        [
+          createElement("h1", {}, "TODO List"),
+          createElement("div", { class: "add-todo" }, [
+            createElement("input", {
+              id: "new-todo",
+              type: "text",
+              placeholder: "Задание",
+            }),
+            createElement("button", { id: "add-btn" }, "+", { click: this.onAddTask }),
+          ]),
+          createElement("ul", { id: "todos" }, children),
+        ],
+        { input: this.onAddInputChange }
+    );
   }
 }
 
