@@ -50,9 +50,13 @@ class Component {
 
 
 class Task {
+  static tasksIdCounter = 0;
+
   constructor(name, isCompleted) {
     this.name = name;
     this.isCompleted = isCompleted;
+    this.id = `task-id-${Task.tasksIdCounter}`;
+    Task.tasksIdCounter++;
   }
 }
 
@@ -88,17 +92,24 @@ class TodoList extends Component {
     this.update();
   }
 
-  _renderTasks() {
+  removeTaskById(id) {
+    const task = document.getElementById(id);
+    task.remove();
+    this.state.tasks = this.state.tasks.filter(t => t.id !== id);
+  }
+
+  renderTasks() {
     let tasks = [];
     for (const task of this.state.tasks) {
       const input = createElement("input", { type: "checkbox" });
       input.checked = task.isCompleted;
 
-      const listItem = createElement("li", {}, [
+      const listItem = createElement("li", { id: task.id }, [
         input,
         createElement("label", {}, task.name),
-        createElement("button", {}, "🗑️")
+        createElement("button", {}, "🗑️", { click: () => this.removeTaskById(task.id)})
       ]);
+
       tasks.push(listItem);
     }
 
@@ -106,7 +117,7 @@ class TodoList extends Component {
   }
 
   render() {
-    let children = this._renderTasks();
+    let children = this.renderTasks();
 
     return createElement(
         "div",

@@ -56,6 +56,10 @@ button {
     margin-right: 10px;
 }
 
+.todo-list li input[type="checkbox"]:checked + label {
+    color: #b4b4b4;
+}
+
 .todo-list li label {
     flex-grow: 1;
 }
