@@ -40,6 +40,12 @@ class Component {
     this._domNode = this.render();
     return this._domNode;
   }
+
+  update() {
+    const newNode = this.render();
+    this._domNode.parentNode.replaceChild(newNode, this._domNode);
+    this._domNode = newNode;
+  }
 }
 
 
@@ -71,8 +77,15 @@ class TodoList extends Component {
   }
 
   onAddTask() {
-    const task = new Task(this.state.currentInput, false);
+    const input = this.state.currentInput;
+    if (input === "") {
+      alert("Введите название новой задачи");
+      return;
+    }
+    const task = new Task(input, false);
+    this.state.currentInput = "";
     this.state.tasks.push(task);
+    this.update();
   }
 
   _renderTasks() {
