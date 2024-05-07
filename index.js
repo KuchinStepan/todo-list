@@ -87,16 +87,33 @@ class Task extends Component {
     super();
     this.taskInfo = props.taskInfo;
     this.removeTaskById = props.removeTaskById;
+    this.state = {
+      firstClick: true,
+    };
+  }
+
+  handleClickWithId(buttonId) {
+    if (this.state.firstClick) {
+      const button = document.getElementById(buttonId);
+      button.style.backgroundColor = 'red';
+      this.state.firstClick = false;
+    } else {
+      this.removeTaskById(this.taskInfo.id);
+    }
   }
 
   render() {
     const input = createElement("input", { type: "checkbox" });
     input.checked = this.taskInfo.isCompleted;
+    const buttonStyle =  this.state.firstClick ? "" : "background-color: red;";
+    const bondedHandler = this.handleClickWithId.bind(this);
+    const buttonId = `button-${this.taskInfo.id}`;
 
     return createElement("li", {id: this.taskInfo.id}, [
       input,
       createElement("label", {}, this.taskInfo.name),
-      createElement("button", {}, "🗑️", {click: () => this.removeTaskById(this.taskInfo.id)})
+      createElement("button", { style: buttonStyle, id: buttonId },
+                    "🗑️", {click: () => bondedHandler(buttonId)})
     ]);
   }
 }
@@ -119,12 +136,10 @@ class TodoList extends Component {
   }
 
   onAddInputChange(event) {
-    console.log(this.state)
     this.state.currentInput = event.target.value;
   }
 
   onAddTask() {
-    console.log(this.state)
     const input = this.state.currentInput;
     if (input === "") {
       alert("Введите название новой задачи");
